@@ -1,4 +1,5 @@
-// lisa_architect.js - เวอร์ชันใส่กุญแจโดยตรง (ใช้ง่ายที่สุด)
+// lisa_architect.js - เวอร์ชันดึงกุญแจจากไฟล์ .env (ปลอดภัย 100%)
+require('dotenv').config(); // โหลดข้อมูลจากไฟล์ .env
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { exec } = require('child_process');
 const fs = require('fs');
@@ -6,12 +7,12 @@ const readline = require('readline');
 const path = require('path');
 
 // ==========================================
-// 🔑 ใส่ API KEY ของคุณเอกตรงนี้ (ในเครื่องหมายคำพูด)
-const API_KEY = "AIzaSyAEr_Woq2Dnn5KfTHNQNEA6yoGkrbjG0mc"; 
+// 🔑 ดึง API KEY จากไฟล์ .env (ปลอดภัย ไม่หลุดไปบน GitHub)
+const API_KEY = process.env.API_KEY; 
 // ==========================================
 
-if (!API_KEY || API_KEY.includes("ใส่_API_KEY")) {
-  console.error("❌ Error: ลืมใส่ API KEY หรือเปล่าครับ? ไปแก้ที่บรรทัด 8 ก่อนนะ");
+if (!API_KEY) {
+  console.error("❌ Error: ไม่พบ API KEY ในระบบค่ะ กรุณาตรวจสอบไฟล์ .env นะคะ");
   process.exit(1);
 }
 
@@ -24,7 +25,7 @@ const rl = readline.createInterface({
 });
 
 console.log("------------------------------------------------------");
-console.log("👩‍💻 Lisa Architect: ระบบพร้อมทำงานแล้วค่ะ (Direct Key Mode)");
+console.log("👩‍💻 Lisa Architect: ระบบพร้อมทำงานแล้วค่ะ (Secure Env Mode)");
 console.log("------------------------------------------------------");
 
 const chatLoop = () => {
