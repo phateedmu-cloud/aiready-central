@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AI Ready Hotel</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: #1a73e8; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #1a73e8; color: white; }
+        tr:hover { background-color: #f1f1f1; }
+        .status-new { background-color: #ffeb3b; padding: 5px 10px; border-radius: 15px; font-size: 0.9em; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📊 รายชื่อลูกค้าที่สนใจ (Leads) - AI Ready Hotel</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>วันที่ติดต่อ</th>
+                <th>ชื่อโรงแรม</th>
+                <th>ชื่อผู้ติดต่อ</th>
+                <th>เบอร์โทรศัพท์</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody id="leadTableBody">
+            <tr><td colspan="5" style="text-align: center;">กำลังโหลดข้อมูล...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    async function loadLeads() {
+        try {
+            const response = await fetch('/api/leads');
+            const leads = await response.json();
+            const tableBody = document.getElementById('leadTableBody');
+            
+            tableBody.innerHTML = ''; // ล้างข้อมูลเดิม
+
+            if(leads.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">ยังไม่มีข้อมูลลูกค้าค่ะ</td></tr>';
+                return;
+            }
+
+            leads.forEach(lead => {
+                // แปลงวันที่ให้สวยงามอ่านง่าย
+                const date = new Date(lead.createdAt).toLocaleString('th-TH');
+                
+                const row = `<tr>
+                    <td>${date}</td>
+                    <td><b>${lead.hotelName || '-'}</b></td>
+                    <td>${lead.contactName || '-'}</td>
+                    <td>${lead.contactDetail || '-'}</td>
+                    <td><span class="status-new">${lead.status}</span></td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('leadTableBody').innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
+        }
+    }
+
+    // โหลดข้อมูลทันทีที่เปิดหน้าเว็บ
+    loadLeads();
+</script>
+
+</body>
+</html>

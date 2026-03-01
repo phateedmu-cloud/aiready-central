@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Ready Hotel - Chat with Lisa</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .chat-container { width: 400px; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
+        .chat-header { background: #1a73e8; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; }
+        .chat-box { height: 400px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #fafafa; }
+        .message { max-width: 80%; padding: 10px 15px; border-radius: 20px; font-size: 0.95em; line-height: 1.4; }
+        .bot-msg { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user-msg { background: #1a73e8; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; background: white; }
+        input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
+        button { background: #1a73e8; color: white; border: none; padding: 10px 15px; margin-left: 10px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1557b0; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">🤖 Lisa - AI Ready Hotel</div>
+    <div class="chat-box" id="chatBox">
+        <div class="message bot-msg">สวัสดีค่ะ ยินดีต้อนรับสู่ AI-Ready Hotel ค่ะ ลิซ่าเป็น AI Assistant ผู้ช่วยส่วนตัวที่จะพาโรงแรมของคุณก้าวเข้าสู่ยุค AI Search ค่ะ วันนี้มีอะไรให้ลิซ่าช่วยไหมคะ?</div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="พิมพ์ข้อความของคุณที่นี่..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">ส่ง</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage() {
+        const inputField = document.getElementById('userInput');
+        const message = inputField.value.trim();
+        if (message === '') return;
+
+        const chatBox = document.getElementById('chatBox');
+        
+        // 1. แสดงข้อความฝั่งลูกค้า
+        chatBox.innerHTML += `<div class="message user-msg">${message}</div>`;
+        inputField.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // 2. แสดงข้อความกำลังพิมพ์
+        const loadingId = "loading-" + Date.now();
+        chatBox.innerHTML += `<div class="message bot-msg" id="${loadingId}">กำลังคิดคำตอบนะคะ... 🧠</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // 3. ส่งข้อความไปหาสมองลิซ่า (Server)
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+            
+            const data = await response.json();
+            
+            // 4. เอาคำตอบของลิซ่ามาแสดง
+            document.getElementById(loadingId).remove(); // ลบข้อความกำลังคิดออก
+            chatBox.innerHTML += `<div class="message bot-msg">${data.reply}</div>`;
+            
+        } catch (error) {
+            document.getElementById(loadingId).innerText = "เชื่อมต่อระบบขัดข้อง กรุณาลองใหม่ค่ะ";
+        }
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') sendMessage();
+    }
+</script>
+
+</body>
+</html>

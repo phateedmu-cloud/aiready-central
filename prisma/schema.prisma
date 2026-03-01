@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ตารางที่ 1: เก็บข้อมูลลูกค้าที่ทักแชทมาจากลิซ่า (Leads)
+model Lead {
+  id            Int      @id @default(autoincrement())
+  hotelName     String   // ชื่อโรงแรม
+  province      String?  // จังหวัด
+  roomCount     Int?     // จำนวนห้องพัก (เพื่อจัด Size S/M/L)
+  contactName   String   // ชื่อผู้ประสานงาน
+  contactDetail String   // เบอร์โทรศัพท์ หรือ Line ID
+  status        String   @default("NEW") // สถานะ: NEW, CONTACTED, CLOSED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ตารางที่ 2: บริหารจัดการ Voucher (Zero Investment)
+model Voucher {
+  id            Int      @id @default(autoincrement())
+  hotelName     String   // ชื่อโรงแรมที่แลกเปลี่ยน
+  value         Float    @default(129000) // มูลค่าอ้างอิงระบบ (129,000 บาท)
+  status        String   @default("AVAILABLE") // สถานะ: AVAILABLE, USED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ตารางที่ 3: ตั้งค่าการรับเงินตรงของโรงแรม (Payment Gateway)
+model PaymentConfig {
+  id            Int      @id @default(autoincrement())
+  hotelName     String   // ชื่อโรงแรม
+  merchantCode  String?  // รหัสร้านค้าสำหรับผูกกับ ChillPay
+  isActive      Boolean  @default(false) // เปิดใช้งานรับเงินตรงหรือยัง
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+// 1. ตารางเก็บข้อมูลประเภทห้องพัก
+model RoomType {
+  id          String    @id @default(cuid())
+  name        String    
+  slug        String    @unique 
+  price       Int       
+  description String?   
+  size        Int       
+  guests      Int       
+  totalStock  Int       @default(5) 
+  images      String[]  
+  bookings    Booking[] 
+  createdAt   DateTime  @default(now())
+}
+
+// 2. ตารางเก็บใบจอง
+model Booking {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now()) 
+  
+  customerName  String
+  customerEmail String
+  customerPhone String
+  
+  checkIn       DateTime
+  checkOut      DateTime
+  totalPrice    Int      
+  status        String   @default("pending") 
+  
+  roomTypeId    String
+  roomType      RoomType @relation(fields: [roomTypeId], references: [id])
+}
