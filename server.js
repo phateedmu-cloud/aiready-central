@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-// ✅ 1. เพิ่มเครื่องมือสำหรับอ่านไฟล์ (fs และ path)
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -28,23 +27,18 @@ app.post('/api/chat', async (req, res) => {
     try {
         const userMessage = req.body.message;
         const userLang = req.body.language || "th"; 
-        // 🔑 1. รับรหัสโรงแรมที่หน้าเว็บส่งมา (ถ้าไม่มีให้ถือว่าเป็น AI_READY_HOTEL)
         const hotelId = req.body.hotelId || "AI_READY_HOTEL"; 
 
         chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
 
-        // 🧠 2. สวิตช์แยกร่างสมองลิซ่า
         let roleInstruction = "";
         let contextInformation = "";
 
         if (hotelId === "THE_OLD_PHUKET") {
-            // 🏨 ร่างที่ 1: พนักงานต้อนรับ The Old Phuket
             roleInstruction = `คุณคือ "Lisa" พนักงานต้อนรับเสมือนจริง (Virtual Assistant) ของโรงแรม "The Old Phuket Karon Beach Resort" หน้าที่ของคุณคือตอบคำถามลูกค้าเกี่ยวกับโรงแรมอย่างสุภาพ เป็นมิตร เสมือนพนักงานต้อนรับมืออาชีพ หากลูกค้าสนใจจองห้องพัก ให้สอบถามชื่อและเบอร์โทรศัพท์เพื่อประสานงานต่อ`;
             
-            // 🦀 สั่งให้ลิซ่าไปหยิบไฟล์ที่น้องกุ้งคีบมาอ่าน!
             let hotelKnowledge = "กำลังรอข้อมูลจากระบบค่ะ...";
             try {
-                // 📂 อ่านข้อมูลจากไฟล์ openclawn_result.json
                 const dataPath = path.join(__dirname, 'openclawn_result.json'); 
                 const rawData = fs.readFileSync(dataPath, 'utf8');
                 hotelKnowledge = rawData; 
@@ -57,7 +51,6 @@ app.post('/api/chat', async (req, res) => {
             ${hotelKnowledge}
             `;
         } else {
-            // 💼 ร่างที่ 2: เซลส์ขายระบบ AI Ready Hotel (ค่าเริ่มต้น)
             roleInstruction = `คุณคือ "Lisa" ผู้ช่วย AI ของโครงการ "AI-Ready Hotel" หน้าที่ของคุณคือให้ข้อมูลโครงการ และค่อยๆ เก็บข้อมูลลูกค้าให้ครบ 3 อย่าง (ชื่อโรงแรม, ชื่อผู้ติดต่อ, เบอร์โทรศัพท์)`;
             contextInformation = `
             สถานะข้อมูลที่เก็บได้ตอนนี้:
@@ -67,18 +60,20 @@ app.post('/api/chat', async (req, res) => {
             `;
         }
 
-        // 📝 3. ประกอบร่าง Prompt ใหม่
+        // 📝 ประกอบร่าง Prompt ใหม่ (เพิ่มกฎห้ามทักทายซ้ำ)
         const prompt = `
         ${roleInstruction}
         
         ${contextInformation}
 
-        🚨 กฎสำคัญเรื่องภาษา (STRICT LANGUAGE RULE):
+        🚨 กฎสำคัญเรื่องภาษาและการสื่อสาร (STRICT RULES):
         - ลูกค้าคนนี้กำลังใช้งานเว็บไซต์ในภาษารหัส: "${userLang}"
         - ถ้าภาษาคือ "en" ให้คุณแปลความคิดและตอบกลับเป็น "ภาษาอังกฤษ (English)" ทั้งหมด
         - ถ้าภาษาคือ "it" ให้คุณแปลความคิดและตอบกลับเป็น "ภาษาอิตาลี (Italian)" ทั้งหมด
         - ถ้าภาษาคือ "th" ให้ตอบเป็น "ภาษาไทย"
-        - ไม่ว่าข้อมูลโครงการของคุณจะเป็นภาษาอะไร คำตอบในส่วน "reply" ต้องถูกแปลเป็นภาษา "${userLang}" อย่างสละสลวย เป็นธรรมชาติ และสุภาพเสมอ!
+        - ไม่ว่าข้อมูลโครงการของคุณจะเป็นภาษาอะไร คำตอบในส่วน "reply" ต้องถูกแปลเป็นภาษา "${userLang}" อย่างสละสลวย เป็นธรรมชาติ
+        - 🛑 ห้ามกล่าวทักทาย เช่น "สวัสดีค่ะ", "Hello", "Hi" ซ้ำในทุกประโยค! ให้ตอบคำถามหรือเข้าประเด็นได้เลย เพราะถือว่าได้ทักทายลูกค้าไปแล้วในตอนเริ่มต้น
+        - ลงท้ายประโยคอย่างสุภาพเสมอ
 
         กฎการคุย:
         - ชวนคุยและตอบคำถามอย่างเป็นมิตร
@@ -104,7 +99,6 @@ app.post('/api/chat', async (req, res) => {
         let aiText = result.response.text().replace(/```json|```/g, '').trim();
         const aiData = JSON.parse(aiText);
 
-        // 3. อัปเดตข้อมูลลูกค้าลงในสมอง (เพิ่มตัวกรอง ป้องกัน AI ส่งคำว่า "null" กลับมา)
         const checkValidData = (text) => {
             if (!text) return null;
             if (typeof text === 'string' && text.toLowerCase() === 'null') return null;
@@ -121,7 +115,6 @@ app.post('/api/chat', async (req, res) => {
         const newPhone = checkValidData(aiData.extracted.phone);
         if (newPhone) leadData.phone = newPhone;
 
-        // 4. บันทึกคำตอบของลิซ่าลงความจำ
         chatHistory.push({ role: "model", parts: [{ text: aiData.reply }] });
 
         if (leadData.hotelName && leadData.contactName && leadData.phone && !isSaved) {
