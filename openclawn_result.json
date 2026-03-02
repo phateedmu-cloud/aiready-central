@@ -1,0 +1,43 @@
+{
+  "hotelName": "The Old Phuket Karon Beach Resort",
+  "description_th": "โรงแรมแห่งนี้ผสมผสานมรดก ความทันสมัย และบรรยากาศที่สร้างความสวยงามโดดเด่น ตั้งอยู่ใจกลางหาดกะรนที่สวยงามที่สุดของเมือง ให้ความสะดวกสบายในการช้อปปิ้งและร้านอาหาร",
+  "description_en": "Heritage, modernism and atmosphere combines to create a striking beauty in the heart of Karon beach. The Old Phuket offers unique accommodation spread over two distinct wings, catering to diverse preferences.",
+  "contact_info": {
+    "phone": "+66 76 396 353-6, +66 86 952 4577",
+    "email": "reservation@theoldphuket.com, sales@azphuket.com",
+    "address": "192/36 Karon Rd.,Karon Beach, Muang, Phuket 83100, Thailand"
+  },
+  "selling_points": [
+    "Unique accommodation in two distinct wings: Sino and Serene.",
+    "Located in the heart of Karon Beach, close to shopping and restaurants.",
+    "Offers a blend of heritage and modern comfort with Sino-Portuguese architecture."
+  ],
+  "restaurants_and_bars": {
+    "Shark Restaurant": "ให้บริการอาหารเช้าแบบบุฟเฟต์ เวลา 06:30 - 10:30 น.",
+    "Pasha Restaurant": "ให้บริการอาหารไทยและนานาชาติ เวลา 11:00 - 23:00 น.",
+    "KO-I Bar": "ตั้งอยู่ชั้น 3 ฝั่ง Sino Wing บริการของว่างและเครื่องดื่ม เวลา 10:00 - 19:00 น.",
+    "Serene Pool Bar": "ตั้งอยู่ที่ฝั่ง Serene Wing บริการของว่างและเครื่องดื่ม เวลา 10:00 - 21:00 น.",
+    "Room Service": "บริการรูมเซอร์วิส (อาหารไทยและนานาชาติ) เวลา 11:00 - 22:00 น."
+  },
+  "facilities_and_hours": {
+    "Fitness Center": "เปิดให้บริการเวลา 07:00 - 22:00 น.",
+    "Swimming Pool (Sino Wing)": "สระว่ายน้ำเปิดให้บริการเวลา 10:00 - 19:00 น."
+  },
+  "general_services": [
+    "มีบริการซักรีด (Laundry and dry cleaning service)",
+    "มีบริการพี่เลี้ยงเด็ก (Baby sitting)",
+    "มีแพทย์เรียกได้ตลอดเวลา (Doctor on call)",
+    "มีห้องสมุดและมุมอินเทอร์เน็ต (Library & Internet Corner)",
+    "มีห้องเด็กเล่นและห้องเกม (Kid's Room & Game Room)",
+    "มีที่จอดรถกว้างขวาง (Ample parking area)"
+  ],
+  "room_facilities": [
+    "เครื่องปรับอากาศ",
+    "ระเบียงส่วนตัว",
+    "ตู้เย็นและมินิบาร์",
+    "อ่างอาบน้ำและฝักบัว",
+    "ตู้นิรภัย (Safety deposit box)",
+    "เครื่องชงชาและกาแฟ",
+    "ไดร์เป่าผม"
+  ]
+}

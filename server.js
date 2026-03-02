@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+// ✅ 1. เพิ่มเครื่องมือสำหรับอ่านไฟล์ (fs และ path)
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
@@ -38,15 +41,20 @@ app.post('/api/chat', async (req, res) => {
             // 🏨 ร่างที่ 1: พนักงานต้อนรับ The Old Phuket
             roleInstruction = `คุณคือ "Lisa" พนักงานต้อนรับเสมือนจริง (Virtual Assistant) ของโรงแรม "The Old Phuket Karon Beach Resort" หน้าที่ของคุณคือตอบคำถามลูกค้าเกี่ยวกับโรงแรมอย่างสุภาพ เป็นมิตร เสมือนพนักงานต้อนรับมืออาชีพ หากลูกค้าสนใจจองห้องพัก ให้สอบถามชื่อและเบอร์โทรศัพท์เพื่อประสานงานต่อ`;
             
-            // 🦀 นำข้อมูลที่น้องกุ้ง (Scraper) คีบมาได้ มาใส่ตรงนี้ได้เลยค่ะ!
+            // 🦀 สั่งให้ลิซ่าไปหยิบไฟล์ที่น้องกุ้งคีบมาอ่าน!
+            let hotelKnowledge = "กำลังรอข้อมูลจากระบบค่ะ...";
+            try {
+                // 📂 อ่านข้อมูลจากไฟล์ openclawn_result.json
+                const dataPath = path.join(__dirname, 'openclawn_result.json'); 
+                const rawData = fs.readFileSync(dataPath, 'utf8');
+                hotelKnowledge = rawData; 
+            } catch (err) {
+                console.log("❌ อ๊ะ! ลิซ่าหาไฟล์ข้อมูลน้องกุ้งไม่เจอค่ะ:", err.message);
+            }
+
             contextInformation = `
-            ข้อมูลของโรงแรม The Old Phuket (ใช้อ้างอิงในการตอบคำถาม ห้ามตอบนอกเหนือจากนี้ ถ้าไม่รู้ให้บอกว่าเดี๋ยวให้พนักงานติดต่อกลับ):
-            - สถานที่ตั้ง: หาดกะรน จังหวัดภูเก็ต
-            - เวลา Check-in: 14:00 น. เป็นต้นไป
-            - เวลา Check-out: ไม่เกิน 12:00 น. (เที่ยงวัน)
-            - สระว่ายน้ำ: มี 2 สระ คือสระฝั่ง Sino (สไตล์ชิโนโปรตุกีส) และสระฝั่ง Serene (สไตล์โมเดิร์น)
-            - สัตว์เลี้ยง: ไม่อนุญาตให้นำสัตว์เลี้ยงเข้าพักทุกชนิด
-            ***(คุณเอกสามารถวางข้อมูล Policy และ Facility ที่เหลือ ต่อท้ายตรงนี้ได้เลยนะคะ)***
+            ข้อมูลของโรงแรม The Old Phuket ที่สรุปมาแล้ว (ใช้อ้างอิงในการตอบคำถาม ห้ามตอบนอกเหนือจากนี้ ถ้าไม่รู้ให้บอกว่าเดี๋ยวให้พนักงานติดต่อกลับ):
+            ${hotelKnowledge}
             `;
         } else {
             // 💼 ร่างที่ 2: เซลส์ขายระบบ AI Ready Hotel (ค่าเริ่มต้น)
